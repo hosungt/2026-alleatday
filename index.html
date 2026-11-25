@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>다먹었데이 × 일일 매점 — 조회 방송</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral:#C8443A; --coral-l:#E8705F; --peach:#FCE9DA; --cream:#FFF6EE;
+    --green:#2F8A63; --mint:#E3F2E9; --ink:#2E211F; --sub:#6B4F4A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#1d1716;overflow:hidden}
+  body{font-family:'Jua','Noto Sans KR','Malgun Gothic',sans-serif;color:var(--ink)}
+  #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{width:1920px;height:1080px;position:relative;transform-origin:center center;flex-shrink:0}
+  .slide{position:absolute;inset:0;background:var(--peach);display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;visibility:hidden;transition:opacity .35s ease}
+  .slide.active{opacity:1;visibility:visible}
+  .awning{display:flex;height:84px;flex-shrink:0}
+  .awning span{flex:1;border-radius:0 0 48px 48px}
+  .awning span:nth-child(odd){background:var(--coral-l)}
+  .awning span:nth-child(even){background:var(--cream)}
+  .body{flex:1;padding:48px 110px 70px;display:flex;flex-direction:column;gap:36px;min-height:0}
+  .kicker{font-size:44px;color:var(--coral)}
+  h1{margin:0;font-weight:400;font-size:96px;line-height:1.1;color:var(--coral);letter-spacing:-2px}
+  h2{margin:0;font-weight:400;font-size:84px;line-height:1.1;color:var(--ink);letter-spacing:-1px}
+  .stepno{display:inline-flex;align-items:center;justify-content:center;width:92px;height:92px;border-radius:999px;
+    background:var(--coral);color:#fff;font-size:56px;flex-shrink:0}
+  .head{display:flex;align-items:center;gap:30px}
+  .card{background:#fff;border-radius:36px;padding:36px 48px}
+  .big{font-size:64px;line-height:1.3}
+  .mid{font-size:50px;line-height:1.35}
+  .em{color:var(--coral)}
+  .emg{color:var(--green)}
+  .note{font-family:'Noto Sans KR',sans-serif;font-weight:500;font-size:34px;color:var(--sub);line-height:1.5}
+  .icon{flex-shrink:0}
+  .row{display:flex;gap:36px}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .map text{font-family:'Jua','Noto Sans KR','Malgun Gothic',sans-serif}
+  .map .stop{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .35s ease, transform .35s cubic-bezier(.3,1.6,.5,1);transform:scale(.6)}
+  .map .stop.on{opacity:1;transform:scale(1)}
+  .tourwrap{flex:1;position:relative;overflow:hidden}
+  .tourwrap svg.map{position:absolute;inset:0;width:100%;height:100%}
+  .tourtitle{position:absolute;left:60px;top:30px;background:#fff;border:5px solid var(--coral);color:var(--coral);border-radius:999px;padding:8px 40px;font-size:56px;transition:opacity .4s}
+  .tourhint{position:absolute;left:60px;bottom:30px;background:#fff;border-radius:999px;padding:6px 22px;font:500 26px 'Noto Sans KR',sans-serif;color:var(--sub);transition:opacity .4s}
+  .panel{position:absolute;right:60px;top:50%;width:760px;transform:translate(40px,-50%);opacity:0;pointer-events:none;
+    background:#fff;border:5px solid var(--coral);border-radius:40px;padding:44px 52px;display:flex;flex-direction:column;gap:26px;
+    transition:opacity .45s ease, transform .45s ease}
+  .panel.on{opacity:1;transform:translate(0,-50%)}
+  .phead{display:flex;align-items:center;gap:24px}
+  .pplace{font-size:64px;color:var(--coral);line-height:1.1}
+  .rk{border-radius:20px;padding:12px 4px;text-align:center;font-size:36px;line-height:1.25}
+  .rk b{display:block;font-weight:400;font-size:46px}
+  .mbox{border:4px solid;border-radius:26px;overflow:hidden;font-size:34px;line-height:1.4}
+  .mhead{color:#fff;font-size:42px;padding:6px 24px}
+  .mcat{font-size:36px;border-bottom:3px dashed #F1B9A9;margin-bottom:6px}
+  .mbox small{font-size:24px;color:var(--sub)}
+  .pend{top:30px;right:60px;width:auto;transform:translate(40px,0);font-size:46px;padding:14px 44px;border-radius:999px;display:block;white-space:nowrap}
+  .pend.on{transform:translate(0,0)}
+  .ptext{font-size:58px;line-height:1.28}
+  .presult{font-size:52px;line-height:1.25;background:var(--peach);border-radius:24px;padding:14px 26px}
+  .illus{display:flex;align-items:center;justify-content:center;min-height:200px}
+  .scard{width:230px;height:280px;background:#fff;border:3px solid #E3D2C8;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .stop-row{height:62px;flex-shrink:0;background:#FDEAE2;border-bottom:3px solid #E8A08F;display:flex;align-items:center;justify-content:center;gap:8px;font-size:30px;color:#B23D33}
+  .sbot{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  .slabel{font-size:28px;color:#2A7A57}
+  .scircle{position:relative;width:130px;height:130px;border:3px dashed #A9D8BF;border-radius:999px}
+  .smark{position:absolute;inset:-6px;border:7px solid #D23B30;border-radius:999px;color:#D23B30;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);opacity:0}
+  .smark span{font-size:33px;line-height:1;white-space:nowrap}
+  .smark i{font-style:normal;font-size:18px;letter-spacing:2px}
+  .stool{position:absolute;left:50%;top:-78px;opacity:0}
+  .panel.on .cardin{animation:cardIn .7s cubic-bezier(.2,1.4,.4,1) both .15s}
+  @keyframes cardIn{from{opacity:0;transform:translateY(60px) rotate(-8deg)}to{opacity:1;transform:none}}
+  .panel.on .stool{animation:stampDo 3.2s ease-in-out infinite .3s both}
+  .panel.on .smark{animation:markDo 3.2s ease-out infinite .3s both}
+  @keyframes stampDo{0%{opacity:0;transform:translate(-50%,-150px)}15%{opacity:1;transform:translate(-50%,-150px)}38%{opacity:1;transform:translate(-50%,-6px)}52%{opacity:1;transform:translate(-50%,-6px)}78%{opacity:1;transform:translate(-50%,-170px)}100%{opacity:0;transform:translate(-50%,-170px)}}
+  @keyframes markDo{0%,40%{opacity:0;transform:rotate(-12deg) scale(1.25)}48%{opacity:.95;transform:rotate(-12deg) scale(1)}100%{opacity:.95;transform:rotate(-12deg) scale(1)}}
+  .board{width:420px;background:#FCE3CF;border:3px solid #E8C4AE;border-radius:14px;overflow:hidden;padding-bottom:12px}
+  .bawn{display:flex;height:28px;margin-bottom:12px}
+  .bawn b{flex:1;border-radius:0 0 14px 14px}
+  .bawn b:nth-child(odd){background:#E8705F}.bawn b:nth-child(even){background:#FFF6EE}
+  .bgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:0 12px}
+  .bgrid i{height:26px;border-radius:6px;background:#4FA67F;position:relative}
+  .bgrid i::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:999px;background:#CFE9DA}
+  .panel.on .bgrid i.pick{animation:pickDo 3.4s ease-in-out infinite .3s both}
+  @keyframes pickDo{0%,8%{transform:none;box-shadow:none;opacity:1}22%,34%{transform:scale(1.35);box-shadow:0 0 0 5px #F5C04A;opacity:1}50%{transform:translate(120px,-30px) scale(.8) rotate(25deg);opacity:0}100%{opacity:0}}
+  .slip{width:130px;height:110px;background:#FFFDF5;border:3px solid #E5D9C3;border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;transform:rotate(4deg)}
+  .slip::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #E5D9C3}
+  .slip span{position:relative;font-size:52px;color:#C8443A;background:#FFFDF5;padding:0 6px}
+  .panel.on .slipin{animation:slipDo 3.4s ease-out infinite .3s both}
+  @keyframes slipDo{0%,45%{opacity:0;transform:scale(.3) rotate(-20deg)}60%{opacity:1;transform:scale(1.1) rotate(6deg)}68%,100%{opacity:1;transform:scale(1) rotate(4deg)}}
+  .tkstack{position:relative;width:320px;height:240px}
+  .tk{position:absolute;left:30px;top:80px;width:260px;height:80px;background:#fff;border:3px solid #2E211F;border-radius:12px;display:flex;overflow:hidden}
+  .tk::before,.tk::after{content:"";position:absolute;top:50%;width:22px;height:22px;margin-top:-11px;border:3px solid #2E211F;border-radius:999px;background:#fff}
+  .tk::before{left:-14px}.tk::after{right:-14px}
+  .tkb{flex:1;padding:6px 0 0 20px;font-size:32px;line-height:1.1;display:flex;flex-direction:column;justify-content:center}
+  .tkb small{font-size:15px;color:#555}
+  .tks{width:62px;border-left:3px dashed #2E211F}
+  .tk:nth-child(1){--r:-6deg;--y:-62px;--x:-18px}.tk:nth-child(2){--r:0deg;--y:0px;--x:0px}.tk:nth-child(3){--r:5deg;--y:62px;--x:18px}
+  .panel.on .tk{animation:tkDo 3.6s ease-out infinite both}
+  .panel.on .tk:nth-child(1){animation-delay:.5s}.panel.on .tk:nth-child(2){animation-delay:.9s}.panel.on .tk:nth-child(3){animation-delay:1.3s}
+  @keyframes tkDo{0%{opacity:0;transform:translateX(-120px) scale(.6)}18%{opacity:1;transform:translate(var(--x),var(--y)) rotate(var(--r))}85%{opacity:1;transform:translate(var(--x),var(--y)) rotate(var(--r))}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r))}}
+  /* nav */
+  #hud{position:fixed;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:10px;pointer-events:none;opacity:.85}
+  #hud i{width:12px;height:12px;border-radius:999px;background:rgba(255,255,255,.35)}
+  #hud i.on{background:#fff}
+  #hint{position:fixed;right:16px;bottom:10px;color:rgba(255,255,255,.5);font:500 13px 'Noto Sans KR',sans-serif}
+  @media print{
+    html,body{background:#fff;overflow:visible;height:auto}
+    #viewport{position:static;display:block}
+    #stage{transform:none!important;width:auto;height:auto}
+    .slide{position:relative;opacity:1;visibility:visible;width:1920px;height:1080px;page-break-after:always}
+    #hud,#hint{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 1. 표지 -->
+<section class="slide active">
+  <div class="awning"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="body center" style="gap:30px">
+    <div style="background:#fff;border:5px solid var(--coral);color:var(--coral);border-radius:999px;padding:10px 48px;font-size:52px">학생회 주관</div>
+    <h1 style="font-size:150px">다먹었데이 × 일일 매점</h1>
+    <div style="font-size:72px">오늘 <span class="em">점심시간</span>에 열려요!</div>
+    <div class="row" style="margin-top:20px">
+      <div class="card big" style="padding:22px 48px">11월 26일(목)</div>
+      <div class="card big" style="padding:22px 48px">점심시간</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. 참여 방법 + 약도 (단계별 확대 애니메이션) -->
+<section class="slide" data-tour>
+  <div class="awning"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="tourwrap">
+    <svg class="map" viewBox="-305 -117 1550 804" preserveAspectRatio="xMidYMid meet" role="img" aria-label="식당에서 서쪽 현관, 본관, 연결 통로를 지나 별관 일일 매점까지 가는 길">
+      <rect x="25" y="25" width="295" height="245" rx="14" fill="#FFFFFF" stroke="#2E211F" stroke-width="4"/>
+      <text x="48" y="66" font-size="26" fill="#2E211F">별관</text>
+      <rect x="150" y="160" width="160" height="100" rx="10" fill="#FDE3D8" stroke="#C8443A" stroke-width="4"/>
+      <text x="162" y="186" font-size="20" fill="#C8443A">일일 매점</text>
+      <rect x="320" y="112" width="162" height="50" fill="#F1E4DA" stroke="#2E211F" stroke-width="4"/>
+      <text x="401" y="100" font-size="18" fill="#6B4F4A" text-anchor="middle">연결 통로</text>
+      <rect x="482" y="55" width="500" height="355" rx="14" fill="#FFFFFF" stroke="#2E211F" stroke-width="4"/>
+      <text x="760" y="110" font-size="26" fill="#2E211F" text-anchor="middle">본관</text>
+      <rect x="488" y="330" width="92" height="100" rx="8" fill="#FFF4CC" stroke="#D9A21B" stroke-width="4"/>
+      <text x="534" y="464" font-size="22" fill="#8A5A00" text-anchor="middle">서쪽 현관</text>
+      <rect x="40" y="440" width="320" height="180" rx="14" fill="#FFFFFF" stroke="#2E211F" stroke-width="4"/>
+      <text x="62" y="480" font-size="26" fill="#2E211F">식당</text>
+      <path d="M110 560 L290 560 C340 560 380 520 420 490 L534 410 L534 150 Q534 137 520 137 L250 137 L250 215" fill="none" stroke="#D8C3B8" stroke-width="6" stroke-dasharray="4 12" stroke-linecap="round"/>
+      <path class="route" d="M110 560 L290 560 C340 560 380 520 420 490 L534 410 L534 150 Q534 137 520 137 L250 137 L250 215" fill="none" stroke="#C8443A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <g class="walker"><circle r="17" fill="#FFFFFF" stroke="#C8443A" stroke-width="6"/><circle r="7" fill="#C8443A"/></g>
+      <g class="stop" data-x="110" data-y="560"><circle cx="110" cy="560" r="20" fill="#C8443A"/><text x="110" y="567" font-size="22" fill="#fff" text-anchor="middle">1</text><text x="110" y="604" font-size="22" fill="#2E211F" text-anchor="middle">도장판 받기</text></g>
+      <g class="stop" data-x="290" data-y="560"><circle cx="290" cy="560" r="20" fill="#C8443A"/><text x="290" y="567" font-size="22" fill="#fff" text-anchor="middle">2</text><text x="290" y="604" font-size="22" fill="#2E211F" text-anchor="middle">다 먹고 도장</text></g>
+      <g class="stop" data-x="534" data-y="380"><circle cx="534" cy="380" r="20" fill="#C8443A"/><text x="534" y="387" font-size="22" fill="#fff" text-anchor="middle">3</text><text x="596" y="372" font-size="22" fill="#2E211F">도장판 내고</text><text x="596" y="398" font-size="22" fill="#C8443A">뽑기!</text></g>
+      <g class="stop" data-x="250" data-y="137"><circle cx="250" cy="137" r="20" fill="#C8443A"/><text x="250" y="144" font-size="22" fill="#fff" text-anchor="middle">4</text><text x="228" y="100" font-size="22" fill="#2E211F" text-anchor="middle">뽑기 → <tspan fill="#C8443A">교환권</tspan></text></g>
+      <g class="stop" data-x="250" data-y="215"><circle cx="250" cy="215" r="20" fill="#2F8A63"/><text x="250" y="222" font-size="22" fill="#fff" text-anchor="middle">5</text><text x="250" y="252" font-size="22" fill="#2E211F" text-anchor="middle">간식 교환</text></g>
+    </svg>
+
+    <div class="tourtitle">이렇게 참여해요</div>
+    <div class="tourhint">→ 를 누르면 다음 단계</div>
+
+    <div class="panel" data-p="1">
+      <div class="phead"><span class="stepno">1</span><span class="pplace">식당</span></div>
+      <div class="ptext">반찬과 국을<br><span class="em">모두 받으면</span></div>
+      <div class="presult">→ 도장판 받기</div>
+      <div class="illus"><div class="scard cardin">
+        <div class="stop-row"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B23D33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v7M15 5v7"/></svg>다 받았어요</div>
+        <div class="sbot"><div class="slabel">다 먹었어요</div><div class="scircle"></div></div>
+      </div></div>
+    </div>
+    <div class="panel" data-p="2">
+      <div class="phead"><span class="stepno">2</span><span class="pplace">식당</span></div>
+      <div class="ptext"><span class="em">남김없이</span><br>다 먹으면</div>
+      <div class="presult">→ 도장판에 도장 쾅!</div>
+      <div class="illus"><div class="scard">
+        <div class="stop-row"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B23D33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v7M15 5v7"/></svg>다 받았어요</div>
+        <div class="sbot"><div class="slabel">다 먹었어요</div><div class="scircle"><div class="smark"><span>다먹음!</span><i>★ ★ ★</i></div>
+          <svg class="stool" aria-hidden="true" width="120" height="150" viewBox="0 0 120 150"><circle cx="60" cy="24" r="20" fill="#8A5A3C"/><rect x="50" y="40" width="20" height="50" rx="6" fill="#A86E48"/><rect x="18" y="88" width="84" height="30" rx="8" fill="#2E211F"/><rect x="22" y="118" width="76" height="14" rx="4" fill="#D23B30"/></svg></div></div>
+      </div></div>
+    </div>
+    <div class="panel" data-p="3">
+      <div class="phead"><span class="stepno">3</span><span class="pplace">서쪽 현관</span></div>
+      <div class="ptext">도장 찍힌<br>도장판을 내면</div>
+      <div class="presult">→ 뽑기! <span style="font-size:40px;color:var(--sub)">(1등 ~ 5등)</span></div>
+      <div class="illus" style="gap:26px">
+        <div class="board"><div class="bawn"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><div class="bgrid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="pick"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C8443A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <div class="slip slipin"><span>3등</span></div>
+      </div>
+    </div>
+    <div class="panel" data-p="4" style="width:900px">
+      <div class="phead"><span class="stepno">4</span><span class="pplace">별관 공용교실</span></div>
+      <div style="font-size:36px;color:var(--sub);margin-top:-6px">귀신의 집 했던 바로 그곳!</div>
+      <div class="ptext" style="font-size:52px">뽑기 종이를 내면<br>등수만큼 <span class="em">교환권</span>을 받아요</div>
+      <div class="illus" style="gap:30px">
+        <div class="slip"><span>3등</span></div>
+        <svg aria-hidden="true" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#C8443A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <div class="tkstack"><div class="tk"><div class="tkb"><small>다먹었데이 일일 매점</small>교환권 1장</div><div class="tks"></div></div><div class="tk"><div class="tkb"><small>다먹었데이 일일 매점</small>교환권 1장</div><div class="tks"></div></div><div class="tk"><div class="tkb"><small>다먹었데이 일일 매점</small>교환권 1장</div><div class="tks"></div></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px">
+        <div class="rk" style="background:#C8443A;color:#fff"><b>1등</b>5장</div>
+        <div class="rk" style="background:#D2603A;color:#fff"><b>2등</b>4장</div>
+        <div class="rk" style="background:#F5C04A"><b>3등</b>3장</div>
+        <div class="rk" style="background:#BFE3CF;color:#1F4D38"><b>4등</b>2장</div>
+        <div class="rk" style="background:#FFF6EE;border:3px solid #E8D5CB"><b>5등</b>1장</div>
+      </div>
+    </div>
+    <div class="panel" data-p="5" style="width:1060px;gap:18px;padding:34px 44px">
+      <div class="phead"><span class="stepno" style="background:var(--green)">5</span><span class="pplace">일일 매점에서 간식 교환</span></div>
+      <div class="mbox" style="border-color:var(--coral)">
+        <div class="mhead" style="background:var(--coral)">교환권 1장</div>
+        <div style="display:grid;grid-template-columns:1fr 1.15fr 1.1fr;gap:20px;padding:14px 22px 16px">
+          <div><div class="mcat em">디저트</div>츄파춥스 젤리<br>왕꿈틀이<br>오뜨 <small>2개·초코/치즈</small></div>
+          <div><div class="mcat em">과자</div>꼬북칩 <small>콘소메</small><br>오레오<br>매운 새우깡<br>프링글스<br>홈런볼</div>
+          <div><div class="mcat em">음료</div>파워오투<br>이로하스 피치<br>보성홍차 아이스티</div>
+        </div>
+      </div>
+      <div class="mbox" style="border-color:var(--green)">
+        <div class="mhead" style="background:var(--green)">교환권 2장 · 프리미엄</div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 20px;padding:14px 22px 16px">
+          <div>꼬북칩 <small>초코츄러스</small></div><div>랑드샤 쇼콜라</div><div>너즈 구미</div>
+          <div>모구모구 <small>복숭아·리치</small></div><div>아몬드 초코볼</div><div>페레로로쉐</div>
+        </div>
+      </div>
+      <div style="font-size:36px;text-align:center">교환권은 <span class="em">섞어 쓰기 OK!</span> · <span class="em">오늘만</span> 사용</div>
+    </div>
+    <div class="panel pend" data-p="end">
+      식당 <span class="em">→</span> 서쪽 현관 <span class="em">→</span> 별관 일일 매점
+    </div>
+  </div>
+</section>
+
+<!-- 7. 쓰레기 처리 -->
+<section class="slide">
+  <div class="awning"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="body">
+    <h1>쓰레기는 이렇게 버려요</h1>
+    <div class="row" style="flex:1">
+      <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;border:6px solid var(--green)">
+        <svg aria-hidden="true" width="170" height="170" viewBox="0 0 24 24" fill="none" stroke="#2F8A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+        <div style="font-size:60px" class="emg">재활용 쓰레기</div>
+        <div class="mid">페트병, 종이 박스 등</div>
+        <div style="font-size:70px;line-height:1.2">집에 가져가서 버리기</div>
+      </div>
+      <div class="card" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;border:6px solid var(--coral)">
+        <svg aria-hidden="true" width="170" height="170" viewBox="0 0 24 24" fill="none" stroke="#C8443A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+        <div style="font-size:60px" class="em">일반 쓰레기</div>
+        <div class="mid">과자 봉지 등</div>
+        <div style="font-size:70px;line-height:1.2">교실 쓰레기통에 버리기</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 수업시간 취식 금지 + 마무리 -->
+<section class="slide">
+  <div class="awning"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="body center" style="gap:40px">
+    <div style="width:260px;height:260px;border-radius:999px;background:#fff;border:10px solid var(--coral);display:flex;align-items:center;justify-content:center;position:relative">
+      <svg aria-hidden="true" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="#2E211F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l1 2-1 2v12l1 2h10l1-2V7l-1-2 1-2z"/><path d="M9 11h6M9 15h4"/></svg>
+      <div style="position:absolute;width:300px;height:10px;background:var(--coral);transform:rotate(-45deg);border-radius:10px"></div>
+    </div>
+    <h1 style="font-size:120px">수업시간에는 먹으면 안 돼요!</h1>
+    <div style="margin-top:20px;background:var(--coral);color:#fff;border-radius:999px;padding:20px 60px;font-size:60px">남김없이 다 먹고, 간식 받아 가세요!</div>
+    <div class="note" style="font-size:40px">- 2026 증산중 학생회 -</div>
+  </div>
+</section>
+
+</div></div>
+<div id="hud"></div>
+<div id="hint">← → 이동 · F 전체화면</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var hud = document.getElementById('hud');
+  var cur = 0;
+  slides.forEach(function(){ hud.appendChild(document.createElement('i')); });
+  // 참여 방법 약도: 단계별 확대 애니메이션
+  function ease(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2; }
+  function Tour(slide){
+    var svg = slide.querySelector('svg.map'), path = svg.querySelector('.route'), walker = svg.querySelector('.walker');
+    var stops = [].slice.call(svg.querySelectorAll('.stop'));
+    var panels = {}; [].forEach.call(slide.querySelectorAll('.panel'), function(p){ panels[p.getAttribute('data-p')] = p; });
+    var title = slide.querySelector('.tourtitle'), hint = slide.querySelector('.tourhint');
+    var wrap = slide.querySelector('.tourwrap');
+    var L = path.getTotalLength();
+    var marks = stops.map(function(g){
+      var x = +g.getAttribute('data-x'), y = +g.getAttribute('data-y'), best = 0, bd = 1e9;
+      for (var l = 0; l <= L; l += 1) { var p = path.getPointAtLength(l), d = (p.x-x)*(p.x-x) + (p.y-y)*(p.y-y); if (d < bd) { bd = d; best = l; } }
+      return best;
+    });
+    // 카메라: 초점(fx,fy), 화면 너비 W, 초점이 놓일 가로 위치 ax
+    var S = [
+      { cam:[470,285,1550,.5], len:0,        panel:null },
+      { cam:[200,530,700,.3],  len:marks[0], panel:'1' },
+      { cam:[200,530,700,.3],  len:marks[1], panel:'2' },
+      { cam:[534,380,650,.3],  len:marks[2], panel:'3' },
+      { cam:[190,150,700,.3],  len:marks[3], panel:'4' },
+      { cam:[175,150,820,.22], len:L,        panel:'5' },
+      { cam:[470,285,1550,.5], len:L,        panel:'end' }
+    ];
+    var self = this, i = 0, cur = { vb:null, len:0 }, raf = null;
+    function vbOf(c){
+      var r = wrap.clientHeight / wrap.clientWidth, W = c[2], H = W * r;
+      return [c[0] - c[3] * W, c[1] - H / 2, W, H];
+    }
+    function apply(vb, len){
+      svg.setAttribute('viewBox', vb.join(' '));
+      path.style.strokeDasharray = L; path.style.strokeDashoffset = L - len;
+      var p = path.getPointAtLength(len); walker.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ')');
+      stops.forEach(function(g, k){ g.classList.toggle('on', len >= marks[k] - 1); });
+      cur.vb = vb; cur.len = len;
+    }
+    function setPanel(key){
+      Object.keys(panels).forEach(function(k){ panels[k].classList.toggle('on', k === key); });
+      var over = key !== null && key !== 'end';
+      title.style.opacity = over ? 0 : 1; hint.style.opacity = (key === 'end') ? 0 : 1;
+    }
+    function go(n, instant){
+      if (raf) cancelAnimationFrame(raf);
+      i = n; var st = S[n], to = vbOf(st.cam);
+      setPanel(null);
+      if (instant || !cur.vb) { apply(to, st.len); setPanel(st.panel); return; }
+      var from = cur.vb.slice(), l0 = cur.len, l1 = st.len;
+      var dur = Math.max(1300, Math.abs(l1 - l0) / L * 7000), t0 = null;
+      function f(ts){
+        if (t0 === null) t0 = ts;
+        var t = Math.min(1, (ts - t0) / dur), e = ease(t);
+        apply(from.map(function(v, k){ return v + (to[k] - v) * e; }), l0 + (l1 - l0) * e);
+        if (t < 1) raf = requestAnimationFrame(f); else { raf = null; setPanel(st.panel); }
+      }
+      raf = requestAnimationFrame(f);
+    }
+    this.enter = function(atEnd){ cur.vb = null; go(atEnd ? S.length - 1 : 0, true); };
+    this.next = function(){ if (i < S.length - 1) { go(i + 1); return true; } return false; };
+    this.prev = function(){ if (i > 0) { go(i - 1); return true; } return false; };
+  }
+  var tours = slides.map(function(s){ return s.hasAttribute('data-tour') ? new Tour(s) : null; });
+  function show(n, atEnd){
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, i){ s.classList.toggle('active', i === cur); });
+    Array.prototype.forEach.call(hud.children, function(d, i){ d.classList.toggle('on', i === cur); });
+    if (tours[cur]) tours[cur].enter(atEnd);
+  }
+  function next(){ if (tours[cur] && tours[cur].next()) return; if (cur < slides.length - 1) show(cur + 1); }
+  function prev(){ if (tours[cur] && tours[cur].prev()) return; if (cur > 0) show(cur - 1, true); }
+  function fit(){
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Backspace') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+      else { document.exitFullscreen && document.exitFullscreen(); }
+    }
+  });
+  document.addEventListener('click', function(e){
+    if (e.clientX < window.innerWidth / 3) prev(); else next();
+  });
+  fit(); show(0);
+})();
+</script>
+</body>
+</html>
