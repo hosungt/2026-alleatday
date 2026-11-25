@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>다먹었데이 × 일일 매점</title>
+<meta name="description" content="11월 26일(목) 점심시간 · 급식 다 먹고, 뽑기 하고, 간식 받아 가세요!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://2026-alleatday.vercel.app/">
+<meta property="og:title" content="다먹었데이 × 일일 매점">
+<meta property="og:description" content="11월 26일(목) 점심시간 · 급식 다 먹고, 뽑기 하고, 간식 받아 가세요!">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -103,6 +108,16 @@
   .panel.on .tk{animation:tkDo 3.6s ease-out infinite both}
   .panel.on .tk:nth-child(1){animation-delay:.5s}.panel.on .tk:nth-child(2){animation-delay:.9s}.panel.on .tk:nth-child(3){animation-delay:1.3s}
   @keyframes tkDo{0%{opacity:0;transform:translateX(-120px) scale(.6)}18%{opacity:1;transform:translate(var(--x),var(--y)) rotate(var(--r))}85%{opacity:1;transform:translate(var(--x),var(--y)) rotate(var(--r))}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r))}}
+  .ptable{display:flex;flex-direction:column;gap:12px}
+  .pr{display:grid;grid-template-columns:96px 1fr 150px 90px;align-items:center;gap:18px}
+  .pr b{font-weight:400;font-size:44px}
+  .pbar{height:44px;background:#F6ECE6;border-radius:12px;overflow:hidden}
+  .pbar i{display:block;height:100%;width:var(--w);border-radius:12px}
+  .panel.on .pbar i{animation:barIn .9s cubic-bezier(.2,.9,.3,1) both .25s}
+  @keyframes barIn{from{width:0}to{width:var(--w)}}
+  .pp{font-size:46px;text-align:right}
+  .pr small{font-family:'Noto Sans KR',sans-serif;font-weight:500;font-size:26px;color:var(--sub)}
+  .fair{background:#FFF4CC;border:4px dashed #D9A21B;border-radius:26px;padding:20px 30px;display:flex;flex-direction:column;gap:6px;text-align:center}
   /* nav */
   #hud{position:fixed;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:10px;pointer-events:none;opacity:.85}
   #hud i{width:12px;height:12px;border-radius:999px;background:rgba(255,255,255,.35)}
@@ -191,6 +206,20 @@
         <div class="board"><div class="bawn"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div><div class="bgrid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="pick"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
         <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C8443A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         <div class="slip slipin"><span>3등</span></div>
+      </div>
+    </div>
+    <div class="panel" data-p="3b" style="width:920px;gap:20px">
+      <div class="phead"><span class="stepno">3</span><span class="pplace">뽑기 확률</span><span style="margin-left:auto;font-size:34px;color:var(--sub)">뽑기판 1판 = 220칸</span></div>
+      <div class="ptable">
+        <div class="pr"><b>1등</b><div class="pbar"><i style="--w:2.5%;background:#C8443A"></i></div><span class="pp">1.4%</span><small>3칸</small></div>
+        <div class="pr"><b>2등</b><div class="pbar"><i style="--w:5.4%;background:#D2603A"></i></div><span class="pp">3.2%</span><small>7칸</small></div>
+        <div class="pr"><b>3등</b><div class="pbar"><i style="--w:7.7%;background:#E0A21B"></i></div><span class="pp">4.5%</span><small>10칸</small></div>
+        <div class="pr"><b>4등</b><div class="pbar"><i style="--w:53.8%;background:#4FA67F"></i></div><span class="pp">31.8%</span><small>70칸</small></div>
+        <div class="pr"><b>5등</b><div class="pbar"><i style="--w:100.0%;background:#8FB8A4"></i></div><span class="pp">59.1%</span><small>130칸</small></div>
+      </div>
+      <div class="fair">
+        <div style="font-size:46px;line-height:1.25">일찍 가야 1등? <span class="em">아니에요!</span></div>
+        <div style="font-size:38px;line-height:1.35">몇 번째로 뽑든 <span class="em">당첨 확률은 똑같아요</span></div>
       </div>
     </div>
     <div class="panel" data-p="4" style="width:900px">
@@ -302,6 +331,7 @@
       { cam:[200,530,700,.3],  len:marks[0], panel:'1' },
       { cam:[200,530,700,.3],  len:marks[1], panel:'2' },
       { cam:[534,380,650,.3],  len:marks[2], panel:'3' },
+      { cam:[534,380,650,.3],  len:marks[2], panel:'3b' },
       { cam:[190,150,700,.3],  len:marks[3], panel:'4' },
       { cam:[175,150,820,.22], len:L,        panel:'5' },
       { cam:[470,285,1550,.5], len:L,        panel:'end' }
